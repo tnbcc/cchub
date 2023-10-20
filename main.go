@@ -1,40 +1,38 @@
 package main
 
 import (
-	"net/http"
-	"strings"
+	"cchub/bootstrap"
+	btsConfig "cchub/config"
+	"cchub/pkg/config"
+	"flag"
+	"fmt"
 
 	"github.com/gin-gonic/gin"
 )
 
+func init() {
+	// 加载 config 目录下的配置信息
+	btsConfig.Initialize()
+}
+
 func main() {
-	// 初始化 Gin 实例
-	r := gin.Default()
 
-	// 注册一个路由
-	r.GET("/", func(c *gin.Context) {
+	// 配置初始化，依赖命令行 --env 参数
+	var env string
+	flag.StringVar(&env, "env", "", "加载 .env 文件，如 --env=testing 加载的是 .env.testing 文件")
+	flag.Parse()
+	config.InitConfig(env)
 
-		// 以 JSON 格式响应
-		c.JSON(http.StatusOK, gin.H{
-			"Hello": "World!",
-		})
-	})
+	// new 一个 Gin Engine 实例
+	router := gin.New()
 
-	//处理404请求
-	r.NoRoute(func(ctx *gin.Context) {
-		//获取标头的Accept信息
-		acceptString := ctx.Request.Header.Get("Accept")
-		if strings.Contains(acceptString, "text/html") {
-			ctx.String(http.StatusNotFound, "页面返回404")
-		} else {
-			// 默认返回 JSON
-			ctx.JSON(http.StatusNotFound, gin.H{
-				"error_code":    404,
-				"error_message": "路由未定义，请确认 url 和请求方法是否正确。",
-			})
-		}
-	})
+	// 初始化路由绑定
+	bootstrap.SetupRoute(router)
 
 	// 运行服务
-	r.Run(":8000")
+	err := router.Run(":" + config.Get("app.port"))
+	if err != nil {
+		// 错误处理，端口被占用了或者其他错误
+		fmt.Println(err.Error())
+	}
 }
