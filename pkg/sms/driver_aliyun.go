@@ -8,10 +8,10 @@ import (
 )
 
 // Aliyun 实现 sms.Driver interface
-type Driver struct{}
+type Aliyun struct{}
 
 // Send 实现 sms.Driver interface 的 Send 方法
-func (s *Driver) Send(phone string, message Message, config map[string]string) bool {
+func (s *Aliyun) Send(phone string, message Message, config map[string]string) bool {
 
 	smsClient := aliyunsmsclient.New("http://dysmsapi.aliyuncs.com/")
 
