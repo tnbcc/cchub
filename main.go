@@ -44,6 +44,11 @@ func main() {
 	// 初始化路由绑定
 	bootstrap.SetupRoute(router)
 
+	// router.GET("/test_auth", middlewares.AuthJWT(), func(c *gin.Context) {
+	// 	userModel := auth.CurrentUser(c)
+	// 	response.Data(c, userModel)
+	// })
+
 	// 运行服务
 	err := router.Run(":" + config.Get("app.port"))
 	if err != nil {
