@@ -5,6 +5,8 @@ import (
 	"cchub/app/http/controllers/api/v1/auth"
 	"cchub/app/http/middlewares"
 
+	controllers "cchub/app/http/controllers/api/v1"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -51,4 +53,8 @@ func RegisterAPIRoutes(r *gin.Engine) {
 			authGroup.POST("/verify-codes/captcha", middlewares.LimitPerRoute("50-H"), vcc.ShowCaptcha)
 		}
 	}
+
+	uc := new(controllers.UsersController)
+	//获取当前用户
+	v1.GET("/user", middlewares.AuthJWT(), uc.CurrentUser)
 }
