@@ -2,6 +2,7 @@ package v1
 
 import (
 	"cchub/app/models/topic"
+	"cchub/app/policies"
 	"cchub/app/requests"
 	"cchub/pkg/auth"
 	"cchub/pkg/response"
@@ -39,6 +40,10 @@ func (ctrl *TopicsController) Update(c *gin.Context) {
 	topicModel := topic.Get(c.Param("id"))
 	if topicModel.ID == 0 {
 		response.Abort404(c)
+		return
+	}
+	if ok := policies.CanModifyTopic(c, topicModel); !ok {
+		response.Abort403(c)
 		return
 	}
 
