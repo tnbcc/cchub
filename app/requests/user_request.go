@@ -1,6 +1,7 @@
 package requests
 
 import (
+	"cchub/app/requests/validators"
 	"cchub/pkg/auth"
 
 	"github.com/gin-gonic/gin"
@@ -11,6 +12,11 @@ type UserUpdateProfileRequest struct {
 	Name         string `valid:"name" json:"name"`
 	City         string `valid:"city" json:"city"`
 	Introduction string `valid:"introduction" json:"introduction"`
+}
+
+type UserUpdateEmailRequest struct {
+	Email      string `json:"email,omitempty" valid:"email"`
+	VerifyCode string `json:"verify_code,omitempty" valid:"verify_code"`
 }
 
 func UserUpdateProfile(data interface{}, c *gin.Context) map[string][]string {
@@ -40,4 +46,39 @@ func UserUpdateProfile(data interface{}, c *gin.Context) map[string][]string {
 		},
 	}
 	return validate(data, rules, messages)
+}
+
+func UserUpdateEmail(data interface{}, c *gin.Context) map[string][]string {
+
+	currentUser := auth.CurrentUser(c)
+	rules := govalidator.MapData{
+		"email": []string{
+			"required", "min:4",
+			"max:30",
+			"email",
+			"not_exists:users,email," + currentUser.GetStringID(),
+			"not_in:" + currentUser.Email,
+		},
+		"verify_code": []string{"required", "digits:6"},
+	}
+	messages := govalidator.MapData{
+		"email": []string{
+			"required:Email 为必填项",
+			"min:Email 长度需大于 4",
+			"max:Email 长度需小于 30",
+			"email:Email 格式不正确，请提供有效的邮箱地址",
+			"not_exists:Email 已被占用",
+			"not_in:新的 Email 与老 Email 一致",
+		},
+		"verify_code": []string{
+			"required:验证码答案必填",
+			"digits:验证码长度必须为 6 位的数字",
+		},
+	}
+
+	errs := validate(data, rules, messages)
+	_data := data.(*UserUpdateEmailRequest)
+	errs = validators.ValidateVerifyCode(_data.Email, _data.VerifyCode, errs)
+
+	return errs
 }
