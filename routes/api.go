@@ -52,6 +52,8 @@ func RegisterAPIRoutes(r *gin.Engine) {
 			// 图片验证码
 			authGroup.POST("/verify-codes/captcha", middlewares.LimitPerRoute("50-H"), vcc.ShowCaptcha)
 		}
+
+		//用户
 		uc := new(controllers.UsersController)
 		//获取当前用户
 		v1.GET("/user", middlewares.AuthJWT(), uc.CurrentUser)
@@ -59,6 +61,8 @@ func RegisterAPIRoutes(r *gin.Engine) {
 		{
 			usersGroup.GET("", uc.Index)
 		}
+
+		//分类
 		cgc := new(controllers.CategoriesController)
 		cgcGroup := v1.Group("/categories")
 		{
@@ -66,6 +70,14 @@ func RegisterAPIRoutes(r *gin.Engine) {
 			cgcGroup.POST("", middlewares.AuthJWT(), cgc.Store)
 			cgcGroup.PUT("/:id", middlewares.AuthJWT(), cgc.Update)
 			cgcGroup.DELETE("/:id", middlewares.AuthJWT(), cgc.Delete)
+		}
+
+		//话题
+		tpc := new(controllers.TopicsController)
+		tpcGroup := v1.Group("/topics")
+		{
+			tpcGroup.POST("", middlewares.AuthJWT(), tpc.Store)
+			tpcGroup.PUT("/:id", middlewares.AuthJWT(), tpc.Update)
 		}
 
 	}

@@ -4,8 +4,8 @@ package topic
 import (
 	"cchub/app/models"
 	"cchub/app/models/category"
+	"cchub/app/models/user"
 	"cchub/pkg/database"
-	"os/user"
 )
 
 type Topic struct {
