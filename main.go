@@ -2,6 +2,7 @@ package main
 
 import (
 	"cchub/app/cmd"
+	"cchub/app/cmd/make"
 	"cchub/bootstrap"
 	btsConfig "cchub/config"
 	"cchub/pkg/config"
@@ -49,6 +50,7 @@ func main() {
 		cmd.CmdServe,
 		cmd.CmdKey,
 		cmd.CmdPlay,
+		make.CmdMake,
 	)
 
 	// 配置默认运行 Web 服务
